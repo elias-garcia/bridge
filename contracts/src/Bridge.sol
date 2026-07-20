@@ -11,8 +11,8 @@ import "./interfaces/IMintable.sol";
 
 /// @notice Symmetric bridge contract — identical bytecode deployed on both chains.
 /// Behaviour per token is determined by its configured Mode:
-///   LOCK: canonical token (e.g. ARKV on Base Sepolia)  — escrow on deposit, release on claim.
-///   MINT: wrapped token  (e.g. wARKV on OP Sepolia)    — burn on deposit, mint on claim.
+///   LOCK: canonical token — escrow on deposit, release on claim.
+///   MINT: wrapped token   — burn on deposit, mint on claim.
 contract Bridge is AccessControl, Pausable, EIP712 {
     using SafeERC20 for IERC20;
 
@@ -21,7 +21,6 @@ contract Bridge is AccessControl, Pausable, EIP712 {
     // -------------------------------------------------------------------------
 
     error ZeroAddress();
-
     error UnsupportedToken(address token);
     error ZeroAmount();
     error ZeroRecipient();
@@ -31,7 +30,7 @@ contract Bridge is AccessControl, Pausable, EIP712 {
     error UnknownTokenPair(uint256 srcChainId, address srcToken);
 
     // -------------------------------------------------------------------------
-    // Types
+    // Constants
     // -------------------------------------------------------------------------
 
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
@@ -39,6 +38,10 @@ contract Bridge is AccessControl, Pausable, EIP712 {
     bytes32 public constant MESSAGE_TYPEHASH = keccak256(
         "BridgeMessage(uint256 srcChainId,uint256 dstChainId,address srcToken,address recipient,uint256 amount,uint256 nonce)"
     );
+
+    // -------------------------------------------------------------------------
+    // Types
+    // -------------------------------------------------------------------------
 
     enum Mode {
         NONE,
@@ -133,6 +136,12 @@ contract Bridge is AccessControl, Pausable, EIP712 {
     ) external onlyRole(DEFAULT_ADMIN_ROLE) {
         require(localToken != address(0) && remoteToken != address(0), ZeroAddress());
 
+        // Clean up stale reverse lookup from previous config
+        TokenConfig memory oldCfg = tokenConfigs[localToken];
+        if (oldCfg.remoteToken != address(0)) {
+            delete localTokens[oldCfg.remoteChainId][oldCfg.remoteToken];
+        }
+
         tokenConfigs[localToken] = TokenConfig(mode, remoteChainId, remoteToken);
         localTokens[remoteChainId][remoteToken] = localToken;
 
@@ -141,8 +150,9 @@ contract Bridge is AccessControl, Pausable, EIP712 {
 
     function setAttestor(address _attestor) external onlyRole(DEFAULT_ADMIN_ROLE) {
         require(_attestor != address(0), ZeroAddress());
-        emit AttestorUpdated(attestor, _attestor);
+        address oldAttestor = attestor;
         attestor = _attestor;
+        emit AttestorUpdated(oldAttestor, _attestor);
     }
 
     function pause() external onlyRole(PAUSER_ROLE) { _pause(); }
@@ -163,7 +173,6 @@ contract Bridge is AccessControl, Pausable, EIP712 {
         uint256 nonce = outboundNonce++;
 
         if (cfg.mode == Mode.LOCK) {
-            // CEI: nonce already incremented before external call
             IERC20(token).safeTransferFrom(msg.sender, address(this), amount);
         } else {
             IMintable(token).burn(msg.sender, amount);
@@ -172,7 +181,7 @@ contract Bridge is AccessControl, Pausable, EIP712 {
         emit Deposited(recipient, block.chainid, cfg.remoteChainId, token, amount, nonce);
     }
 
-    /// @notice Inbound: relayer submits an attestor-signed BridgeMessage → release (LOCK) or mint (MINT).
+    /// @notice Inbound: relayer submits an attestor-signed BridgeMessage — release (LOCK) or mint (MINT).
     function claim(BridgeMessage calldata m, bytes calldata sig) external whenNotPaused {
         require(m.dstChainId == block.chainid, WrongChain(block.chainid, m.dstChainId));
 
@@ -192,6 +201,7 @@ contract Bridge is AccessControl, Pausable, EIP712 {
         address localToken = localTokens[m.srcChainId][m.srcToken];
         require(localToken != address(0), UnknownTokenPair(m.srcChainId, m.srcToken));
         Mode mode = tokenConfigs[localToken].mode;
+        require(mode != Mode.NONE, UnsupportedToken(localToken));
 
         if (mode == Mode.LOCK) {
             IERC20(localToken).safeTransfer(m.recipient, m.amount);
@@ -199,7 +209,7 @@ contract Bridge is AccessControl, Pausable, EIP712 {
             IMintable(localToken).mint(m.recipient, m.amount);
         }
 
-        emit Claimed(localToken, m.recipient, m.amount, m.nonce);
+        emit Claimed(m.recipient, localToken, m.amount, m.nonce);
     }
 
     // -------------------------------------------------------------------------
