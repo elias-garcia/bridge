@@ -8,7 +8,7 @@ import "../src/Bridge.sol";
 contract DeploySource is Script {
     function run() external {
         address attestor = vm.envAddress("ATTESTOR_ADDRESS");
-        address admin    = vm.envAddress("ADMIN_ADDRESS");
+        address admin = vm.envAddress("ADMIN_ADDRESS");
 
         vm.startBroadcast();
         Token token = new Token("ARKIV Token", "ARKV");

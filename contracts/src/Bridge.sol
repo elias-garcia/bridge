@@ -91,24 +91,11 @@ contract Bridge is AccessControl, Pausable, EIP712 {
         uint256 nonce
     );
 
-    event Claimed(
-        address indexed recipient,
-        address localToken,
-        uint256 amount,
-        uint256 nonce
-    );
+    event Claimed(address indexed recipient, address localToken, uint256 amount, uint256 nonce);
 
-    event TokenConfigured(
-        address localToken,
-        Mode mode,
-        uint256 remoteChainId,
-        address remoteToken
-    );
+    event TokenConfigured(address localToken, Mode mode, uint256 remoteChainId, address remoteToken);
 
-    event AttestorUpdated(
-        address oldAttestor,
-        address newAttestor
-    );
+    event AttestorUpdated(address oldAttestor, address newAttestor);
 
     // -------------------------------------------------------------------------
     // Constructor
@@ -128,12 +115,10 @@ contract Bridge is AccessControl, Pausable, EIP712 {
     // -------------------------------------------------------------------------
 
     /// @notice Register a token for bridging. Must be called on both chains to wire the pair.
-    function configureToken(
-        address localToken,
-        Mode mode,
-        uint256 remoteChainId,
-        address remoteToken
-    ) external onlyRole(DEFAULT_ADMIN_ROLE) {
+    function configureToken(address localToken, Mode mode, uint256 remoteChainId, address remoteToken)
+        external
+        onlyRole(DEFAULT_ADMIN_ROLE)
+    {
         require(localToken != address(0) && remoteToken != address(0), ZeroAddress());
 
         // Clean up stale reverse lookup from previous config
@@ -155,8 +140,13 @@ contract Bridge is AccessControl, Pausable, EIP712 {
         emit AttestorUpdated(oldAttestor, _attestor);
     }
 
-    function pause() external onlyRole(PAUSER_ROLE) { _pause(); }
-    function unpause() external onlyRole(PAUSER_ROLE) { _unpause(); }
+    function pause() external onlyRole(PAUSER_ROLE) {
+        _pause();
+    }
+
+    function unpause() external onlyRole(PAUSER_ROLE) {
+        _unpause();
+    }
 
     // -------------------------------------------------------------------------
     // Bridge
@@ -190,7 +180,9 @@ contract Bridge is AccessControl, Pausable, EIP712 {
 
         // Verify attestor EIP-712 signature
         bytes32 digest = _hashTypedDataV4(
-            keccak256(abi.encode(MESSAGE_TYPEHASH, m.srcChainId, m.dstChainId, m.srcToken, m.recipient, m.amount, m.nonce))
+            keccak256(
+                abi.encode(MESSAGE_TYPEHASH, m.srcChainId, m.dstChainId, m.srcToken, m.recipient, m.amount, m.nonce)
+            )
         );
         address recovered = ECDSA.recover(digest, sig);
         require(recovered == attestor, BadAttestor(recovered, attestor));

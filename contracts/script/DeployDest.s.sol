@@ -8,7 +8,7 @@ import "../src/Bridge.sol";
 contract DeployDest is Script {
     function run() external {
         address attestor = vm.envAddress("ATTESTOR_ADDRESS");
-        address admin    = vm.envAddress("ADMIN_ADDRESS");
+        address admin = vm.envAddress("ADMIN_ADDRESS");
 
         vm.startBroadcast();
         WrappedToken wrappedToken = new WrappedToken("Wrapped ARKIV Token", "wARKV", admin);
