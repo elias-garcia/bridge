@@ -19,11 +19,13 @@ contract Configure is Script {
         if (block.chainid == sourceChainId) {
             Bridge(sourceBridge).configureToken(sourceToken, Bridge.Mode.LOCK, destChainId, destToken);
             console.log("Configured LOCK on source bridge:", sourceBridge);
-        } else {
+        } else if (block.chainid == destChainId) {
             Bridge(destBridge).configureToken(destToken, Bridge.Mode.MINT, sourceChainId, sourceToken);
-            WrappedToken(destToken).grantRole(WrappedToken(destToken).MINTER_ROLE(), destBridge);
+            WrappedToken(destToken).grantRole(keccak256("MINTER_ROLE"), destBridge);
             console.log("Configured MINT on dest bridge  :", destBridge);
             console.log("Granted MINTER_ROLE to          :", destBridge);
+        } else {
+            revert("unexpected chain");
         }
 
         vm.stopBroadcast();
