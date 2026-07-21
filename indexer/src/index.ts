@@ -14,6 +14,7 @@ ponder.on("SourceBridge:Deposited", async ({ event, context }) => {
     nonce,
     txHash: event.transaction.hash,
     blockNumber: event.block.number,
+    blockTimestamp: event.block.timestamp,
   });
 });
 
@@ -30,6 +31,7 @@ ponder.on("DestBridge:Deposited", async ({ event, context }) => {
     nonce,
     txHash: event.transaction.hash,
     blockNumber: event.block.number,
+    blockTimestamp: event.block.timestamp,
   });
 });
 
@@ -45,6 +47,7 @@ ponder.on("SourceBridge:Claimed", async ({ event, context }) => {
     chainId: BigInt(context.chain.id),
     txHash: event.transaction.hash,
     blockNumber: event.block.number,
+    blockTimestamp: event.block.timestamp,
   });
 });
 
@@ -60,5 +63,6 @@ ponder.on("DestBridge:Claimed", async ({ event, context }) => {
     chainId: BigInt(context.chain.id),
     txHash: event.transaction.hash,
     blockNumber: event.block.number,
+    blockTimestamp: event.block.timestamp,
   });
 });

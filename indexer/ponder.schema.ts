@@ -10,6 +10,7 @@ export const deposit = onchainTable("deposit", (t) => ({
   nonce: t.bigint().notNull(),
   txHash: t.hex().notNull(),
   blockNumber: t.bigint().notNull(),
+  blockTimestamp: t.bigint().notNull(),
 }));
 
 export const claim = onchainTable("claim", (t) => ({
@@ -21,4 +22,5 @@ export const claim = onchainTable("claim", (t) => ({
   chainId: t.bigint().notNull(),
   txHash: t.hex().notNull(),
   blockNumber: t.bigint().notNull(),
+  blockTimestamp: t.bigint().notNull(),
 }));
