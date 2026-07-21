@@ -18,12 +18,6 @@ npm install
 ## Run
 
 ```bash
-npm run dev             # starts on http://localhost:5173
-```
-
-## Build
-
-```bash
-npm run build
-npm run preview         # preview production build
+npm run dev                # development with hot reload (http://localhost:5173)
+npm run build && npm run preview   # production build + serve
 ```

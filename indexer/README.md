@@ -21,7 +21,8 @@ npm install
 ## Run
 
 ```bash
-npm run dev             # starts on http://localhost:42069
+npm run dev             # development mode with hot reload
+npm start               # production mode
 ```
 
 The GraphQL playground is available at `http://localhost:42069/graphql`.

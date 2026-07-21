@@ -58,7 +58,8 @@ Contracts are already deployed on both testnets — the addresses are hardcoded 
 cd indexer
 cp .env.example .env   # fill in RPC URLs and deployed contract addresses
 npm install
-npm run dev             # starts on http://localhost:42069
+npm run dev             # development with hot reload
+npm start               # production mode
 ```
 
 ### 2. Relayer
@@ -67,7 +68,7 @@ npm run dev             # starts on http://localhost:42069
 cd relayer
 cp .env.example .env   # fill in RPC URLs, bridge addresses, and attestor private key
 npm install
-npm run dev
+npm start
 ```
 
 ### 3. UI
@@ -76,7 +77,8 @@ npm run dev
 cd ui
 cp .env.example .env   # defaults should work if indexer runs on :42069
 npm install
-npm run dev             # starts on http://localhost:5173
+npm run dev                        # development (http://localhost:5173)
+npm run build && npm run preview   # production build + serve
 ```
 
 ### Running tests

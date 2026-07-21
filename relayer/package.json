@@ -4,7 +4,7 @@
   "description": "Bridge relayer — polls deposits and submits claims across chains",
   "type": "module",
   "scripts": {
-    "dev": "tsx src/index.ts",
+    "start": "tsx src/index.ts",
     "typecheck": "tsc --noEmit"
   },
   "keywords": [],
