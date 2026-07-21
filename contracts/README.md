@@ -11,6 +11,22 @@ Solidity contracts for a lock-and-mint token bridge between Base Sepolia and Lin
   - `MINT` — wrapped token: burned on deposit, minted on claim.
 - **`IMintable`** — Interface that wrapped tokens must implement to be compatible with the Bridge.
 
+## Deployments
+
+### Base Sepolia (source)
+
+| Contract | Address |
+|---|---|
+| `Token` | [`0xA668a7997b0F000D2D4765C233413Fac05c3307e`](https://sepolia.basescan.org/address/0xA668a7997b0F000D2D4765C233413Fac05c3307e) |
+| `Bridge` | [`0x8B345b1261D017c020C11C5E50B3c66865c4aF97`](https://sepolia.basescan.org/address/0x8B345b1261D017c020C11C5E50B3c66865c4aF97) |
+
+### Linea Sepolia (destination)
+
+| Contract | Address |
+|---|---|
+| `WrappedToken` | [`0xA668a7997b0F000D2D4765C233413Fac05c3307e`](https://sepolia.lineascan.build/address/0xA668a7997b0F000D2D4765C233413Fac05c3307e) |
+| `Bridge` | [`0x8B345b1261D017c020C11C5E50B3c66865c4aF97`](https://sepolia.lineascan.build/address/0x8B345b1261D017c020C11C5E50B3c66865c4aF97) |
+
 ## Setup
 
 Copy `.env.example` to `.env` and fill in your values:
