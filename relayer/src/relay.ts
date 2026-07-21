@@ -170,6 +170,7 @@ async function processDeposit(deposit: Deposit): Promise<void> {
     ],
   });
 
+  await publicClient.waitForTransactionReceipt({ hash: txHash });
   console.log(`[claim] nonce=${nonce} tx=${txHash}`);
 }
 
